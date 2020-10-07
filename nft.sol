@@ -4,14 +4,22 @@ pragma solidity 0.6.0;
 contract NFT {
     // 为指定eth地址分配一个NFT，并绑定nch地址
     // 只有管理员才可以调用此接口
-    function register(string ethAddress, string nchAddress) public onlyOwner {
+    function register(string ethAddress, address nchAddress) public onlyOwner {
     }
 
     // 根据eth地址，查询NFT余额
-    function queryBalance(string ethAddress) public returns (uint256) {
+    function queryBalanceWithEthAddr(string ethAddress) public returns (uint256) {
     }
 
-    // 计算属于某个owner的NFT数量
+    // 根据nch地址，查询NFT余额
+    function queryBalance(address nchAddress) public returns (uint256) {
+    }
+
+    // 计算属于某个owner的NFT数量， 使用eth地址
+    function tokenOfOwnerByIndexWithEthAddr(string ethAddress, uint256 _index) external view returns (uint256) {
+    }
+
+    // 计算属于某个owner的NFT数量， 使用nch地址
     function tokenOfOwnerByIndex(address ethAddress, uint256 _index) external view returns (uint256) {
     }
 
@@ -40,6 +48,14 @@ contract NFT {
 
     /// @dev 所有者启用或禁用操作员时触发。（操作员可管理所有者所持有的NFTs）
     event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
+
+
+    /// @notice 统计所持有的NFTs数量
+    /// @dev NFT 不能分配给零地址，查询零地址同样会异常
+    /// @param ethAddress ： 待查的ETH地址
+    /// @return 返回数量，也许是0
+    function balanceOfWithETHAddr(string ethAddress) external view returns (uint256) {
+    }
 
     /// @notice 统计所持有的NFTs数量
     /// @dev NFT 不能分配给零地址，查询零地址同样会异常
