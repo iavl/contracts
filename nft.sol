@@ -64,6 +64,14 @@ contract NFT {
     function balanceOf(address _owner) external view returns (uint256) {
     }
 
+
+    /// @notice 返回所有者
+    /// @dev NFT 不能分配给零地址，查询零地址抛出异常
+    /// @param _tokenId NFT 的id
+    /// @return 返回所有者对应的eth地址
+    function ownerOfETHAddress(uint256 _tokenId) external view returns (string) {
+    }
+
     /// @notice 返回所有者
     /// @dev NFT 不能分配给零地址，查询零地址抛出异常
     /// @param _tokenId NFT 的id
