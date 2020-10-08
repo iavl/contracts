@@ -1,132 +1,188 @@
-pragma solidity 0.6.0;
+pragma solidity 0.5.8;
+
+import "./Ownable.sol";
 
 // NFT 合约，可使用eth地址或者nch地址查询用户的NFT
-contract NFT {
+contract NFT is Ownable {
+
+    uint256 private maxTokenId;
+
+    // 保存eth地址和nch地址之间的映射关系
+    mapping (string => address) public addrs;
+
+    // 保存NFT通证id和所有者地址之间的映射关系
+    mapping (uint256 => address) private tokenOwners;
+
+    // NFT通证id的存在关系
+    mapping (uint256 => bool) private tokenExists;
+
+    // NFT通证的总供应量
+    uint256 public totalSupply;
+
+    // 地址对应的通证余额
+    mapping(address => uint) private balances;
+
+    mapping (address => mapping (address => uint256)) allowed;
+
+    // 记录每个用户持有的每个通证
+    // 地址 - index - tokenId
+    mapping (address => mapping (uint256 => uint256)) private ownerTokens;
+
+    mapping (uint256 => string) tokenLinks;
+
+    // 返回NFT通证的名称
+    function name()  public pure returns (string memory) {
+        return "BEE-EGG";
+    }
+
+    // 返回NFT通证的符号
+    function symbol() public pure returns (string memory) {
+        return "BEE-EGG";
+    }
+
+    /// 统计所持有的NFTs数量
+    /// @param _ethAddress eth地址
+    /// @return 返回数量，也许是0
+    function balanceOfWithETHAddr(string memory _ethAddress) public view returns (uint256) {
+        address owner = addrs[_ethAddress];
+        return balances[owner];
+    }
+
+    /// 统计所持有的NFTs数量
+    /// @param _owner nch地址
+    /// @return 返回数量，也许是0
+    function balanceOf(address _owner) public view returns (uint256) {
+        return balances[_owner];
+    }
+
     // 为指定eth地址分配一个NFT，并绑定nch地址
     // 只有管理员才可以调用此接口
-    function register(string ethAddress, address nchAddress) public onlyOwner {
+    function mint(string memory _ethAddress, address _nchAddress) public onlyOwner {
+        // 检查_ethAddress和_nchAddress的绑定关系
+        address addr = addrs[_ethAddress];
+        if (addr != address(0)) {
+            require(addr == _nchAddress);
+        }
+
+        maxTokenId += 1;
+
+        addrs[_ethAddress] = _nchAddress;
+        tokenOwners[maxTokenId] = _nchAddress;
+        tokenExists[maxTokenId] = true;
+        balances[_nchAddress] += 1;
+        totalSupply += 1;
     }
 
-    // 根据eth地址，查询NFT余额
-    function queryBalanceWithEthAddr(string ethAddress) public returns (uint256) {
+    // 计算属于某个owner的NFT通证id， 使用eth地址
+    function tokenOfOwnerByIndexWithEthAddr(string memory _ethAddress, uint256 _index) public view returns (uint256) {
+        address owner = addrs[_ethAddress];
+        return ownerTokens[owner][_index];
     }
 
-    // 根据nch地址，查询NFT余额
-    function queryBalance(address nchAddress) public returns (uint256) {
+    // 计算属于某个owner的NFT通证id， 使用nch地址
+    function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns (uint256) {
+        return ownerTokens[_owner][_index];
     }
 
-    // 计算属于某个owner的NFT数量， 使用eth地址
-    function tokenOfOwnerByIndexWithEthAddr(string ethAddress, uint256 _index) external view returns (uint256) {
-    }
-
-    // 计算属于某个owner的NFT数量， 使用nch地址
-    function tokenOfOwnerByIndex(address ethAddress, uint256 _index) external view returns (uint256) {
-    }
-
-    // 对NFT的描述性名称
-    function name() external view returns (string _name) {
-    }
-
-    // 计数合约追踪的NFT
-    // 合约追踪的有效NFT，每个NFT都是已分配和可查询的地址
-    function totalSupply() external view returns (uint256) {
-    }
-
-    // 枚举有效NFT
-    // 抛出异常： _index >= totalSupply()时
-    function tokenByIndex(uint256 _index) external view returns (uint256) {
-    }
-
-    /// @dev 当任何NFT的所有权更改时（不管哪种方式），就会触发此事件。
+    // 事件
+    /// 当任何NFT的所有权更改时（不管哪种方式），就会触发此事件。
     ///  包括在创建时（`from` == 0）和销毁时(`to` == 0), 合约创建时除外。
     event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
 
-    /// @dev 当更改或确认NFT的授权地址时触发。
+    /// 当更改或确认NFT的授权地址时触发。
     ///  零地址表示没有授权的地址。
     ///  发生 `Transfer` 事件时，同样表示该NFT的授权地址（如果有）被重置为“无”（零地址）。
     event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
 
-    /// @dev 所有者启用或禁用操作员时触发。（操作员可管理所有者所持有的NFTs）
-    event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
 
-    /// @notice 统计所持有的NFTs数量
-    /// @dev NFT 不能分配给零地址，查询零地址同样会异常
-    /// @param ethAddress ： 待查的ETH地址
-    /// @return 返回数量，也许是0
-    function balanceOfWithETHAddr(string ethAddress) external view returns (uint256) {
-    }
-
-    /// @notice 统计所持有的NFTs数量
-    /// @dev NFT 不能分配给零地址，查询零地址同样会异常
-    /// @param _owner ： 待查地址
-    /// @return 返回数量，也许是0
-    function balanceOf(address _owner) external view returns (uint256) {
-    }
-
-
-    /// @notice 返回所有者
-    /// @dev NFT 不能分配给零地址，查询零地址抛出异常
-    /// @param _tokenId NFT 的id
-    /// @return 返回所有者对应的eth地址
-    function ownerOfETHAddress(uint256 _tokenId) external view returns (string) {
-    }
-
-    /// @notice 返回所有者
-    /// @dev NFT 不能分配给零地址，查询零地址抛出异常
+    /// 返回所有者
     /// @param _tokenId NFT 的id
     /// @return 返回所有者地址
-    function ownerOf(uint256 _tokenId) external view returns (address) {
+    function ownerOf(uint256 _tokenId) public view returns (address) {
+        require(tokenExists[_tokenId]);
+        return tokenOwners[_tokenId];
     }
 
-    /// @notice 将NFT的所有权从一个地址转移到另一个地址
-    /// @dev 如果`msg.sender` 不是当前的所有者（或授权者）抛出异常
-    /// 如果 `_from` 不是所有者、`_to` 是零地址、`_tokenId` 不是有效id 均抛出异常。
-    /// 暂不支持`_to` 为合约地址，如果`_to` 为合约地址，则抛出异常
-    /// @param _from ：当前的所有者
-    /// @param _to ：新的所有者
-    /// @param _tokenId ：要转移的token id.
-    /// @param data : 附加额外的参数（没有指定格式），传递给接收者。
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) external payable {
+    function removeFromTokenList(address owner, uint256 _tokenId) private {
+        for(uint256 i = 0; ownerTokens[owner][i] != _tokenId;i++){
+            ownerTokens[owner][i] = 0;
+        }
     }
 
-    /// @notice 将NFT的所有权从一个地址转移到另一个地址，功能同上，不带data参数。
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId) external payable {
+    // NFT通证转移
+    // _tokenId必须存在
+    // 不能转给自己
+    // 接收地址不能为0地址
+    function transfer(address _to, uint256 _tokenId) public {
+        address currentOwner = msg.sender;
+        address newOwner = _to;
+
+        require(tokenExists[_tokenId]);
+        require(currentOwner == ownerOf(_tokenId));
+        require(currentOwner != newOwner);
+        require(newOwner != address(0));
+
+        removeFromTokenList(currentOwner, _tokenId);
+        balances[currentOwner] -= 1;
+        tokenOwners[_tokenId] = newOwner;
+        balances[newOwner] += 1;
+        emit Transfer(currentOwner, newOwner, _tokenId);
     }
 
-    /// @notice 转移所有权 -- 调用者负责确认`_to`是否有能力接收NFTs，否则可能永久丢失。
+    /// 转移所有权 -- 调用者负责确认`_to`是否有能力接收NFTs，否则可能永久丢失。
     /// @dev 如果`msg.sender` 不是当前的所有者（或授权者、操作员）抛出异常
     /// 如果 `_from` 不是所有者、`_to` 是零地址、`_tokenId` 不是有效id 均抛出异常。
     /// 暂不支持`_to` 为合约地址，如果`_to` 为合约地址，则抛出异常
-    function transferFrom(address _from, address _to, uint256 _tokenId) external payable {
+    function transferFrom(address _from, address _to, uint256 _tokenId) public {
+        require(tokenExists[_tokenId]);
+
+        address oldOwner = ownerOf(_tokenId);
+        address newOwner = _to;
+
+        require(_from == oldOwner);
+        require(newOwner != oldOwner);
+
+        require(allowed[oldOwner][newOwner] == _tokenId);
+        balances[oldOwner] -= 1;
+        tokenOwners[_tokenId] = newOwner;
+        balances[newOwner] += 1;
+
+        emit Transfer(oldOwner, newOwner, _tokenId);
     }
 
-    /// @notice 更改或确认NFT的授权地址
-    /// @dev 零地址表示没有授权的地址。
+    /// 更改NFT的授权地址
+    /// 零地址表示没有授权的地址。
     ///  如果`msg.sender` 不是当前的所有者或操作员
-    /// @param _approved 新授权的控制者
+    /// @param _to 新授权的控制者
     /// @param _tokenId ： token id
-    function approve(address _approved, uint256 _tokenId) external payable {
+    function approve(address _to, uint256 _tokenId) public {
+        require(msg.sender == ownerOf(_tokenId));
+        require(msg.sender != _to);
+
+        allowed[msg.sender][_to] = _tokenId;
+        emit Approval(msg.sender, _to, _tokenId);
     }
 
-    /// @notice 启用或禁用第三方（操作员）管理 `msg.sender` 所有资产
-    /// @dev 触发 ApprovalForAll 事件，合约必须允许每个所有者可以有多个操作员。
-    /// @param _operator 要添加到授权操作员列表中的地址
-    /// @param _approved True 表示授权, false 表示撤销
-    function setApprovalForAll(address _operator, bool _approved) external {
+    function takeOwnership(uint256 _tokenId) public {
+        require(tokenExists[_tokenId]);
+
+        address oldOwner = ownerOf(_tokenId);
+        address newOwner = msg.sender;
+
+        require(newOwner != oldOwner);
+
+        require(allowed[oldOwner][newOwner] == _tokenId);
+        balances[oldOwner] -= 1;
+        tokenOwners[_tokenId] = newOwner;
+        balances[newOwner] += 1;
+
+        emit Transfer(oldOwner, newOwner, _tokenId);
     }
 
-    /// @notice 获取单个NFT的授权地址
-    /// @dev 如果 `_tokenId` 无效，抛出异常。
-    /// @param _tokenId ：  token id
-    /// @return 返回授权地址， 零地址表示没有。
-    function getApproved(uint256 _tokenId) external view returns (address) {
+    /// 获取NFT通证对应的元数据，或者链接
+    function tokenMetaData(uint256 _tokenId) public view returns (string memory infoUrl) {
+        return tokenLinks[_tokenId];
     }
 
-    /// @notice 查询一个地址是否是另一个地址的授权操作员
-    /// @param _owner 所有者
-    /// @param _operator 代表所有者的授权操作员
-    function isApprovedForAll(address _owner, address _operator) external view returns (bool) {
-    }
 }
-
