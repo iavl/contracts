@@ -38,6 +38,7 @@ function symbol() public pure returns (string memory)
     
 功能描述：获取NFT通证的符号
     
+参数描述：无
     
 Returns:
     
@@ -52,7 +53,8 @@ function totalSupply() public view returns (uint256)
 ```
     
 功能描述：获取NFT通证的总量
-    
+   
+参数描述：无 
     
 Returns:
     
@@ -68,7 +70,13 @@ function balanceOf(address _owner) public view returns (uint256)
 ```
     
 功能描述：统计_owner地址所持有的NFT数量
-    
+
+参数描述：
+
+参数 | 类型  |  描述
+---|---|---
+_owner| address | nch账号地址
+ 
     
 Returns:
     
@@ -84,7 +92,13 @@ function balanceOfWithETHAddr(string memory _ethAddress) public view returns (ui
     
 功能描述：统计指定eth地址所持有的NFT数量
     
-    
+参数描述：
+
+参数 | 类型  |  描述
+---|---|---
+_ethAddress | string | eth钱包地址
+
+
 Returns:
     
 uint256 | _ethAddress所持有的NFT数量
@@ -101,7 +115,14 @@ function beeMint(string memory _ethAddress, address _to, uint256 _tokenId) publi
     
 功能描述：为指定地址产生一个NFT通证
     
-    
+参数描述：
+
+参数 | 类型  |  描述
+---|---|---
+_ethAddress | string | eth钱包地址
+_to | address | nch钱包地址
+_tokenId | uint256 | NFT通证id
+
 Returns:
 无
 
@@ -115,7 +136,13 @@ function tokenByIndex(uint256 _index) public view returns (uint256)
     
 功能描述：根据index获取某个NFT通证的id
     
-    
+参数描述：
+
+参数 | 类型  |  描述
+---|---|---
+_index | uint256 | 索引值
+
+
 Returns:
 
 uint256 | NFT通证id
@@ -129,7 +156,14 @@ function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns
 ```
     
 功能描述：获取某个owner指定index的NFT通证的id
-    
+
+参数描述：
+
+参数 | 类型  |  描述
+---|---|---
+_owner | address | nch账号地址
+_index | uint256 | 索引值
+
     
 Returns:
 
@@ -146,8 +180,14 @@ function tokenOfOwnerByIndexWithEthAddr(string memory _ethAddress, uint256 _inde
 ```
     
 功能描述：获取某个eth地址的指定index的NFT通证的id
-    
-    
+
+参数描述：
+
+参数 | 类型  |  描述
+---|---|---
+_ethAddress | string | eth账号地址
+_index | uint256 | 索引值
+
 Returns:
 
 uint256 | NFT通证id
@@ -164,8 +204,13 @@ function ownerOf(uint256 _tokenId) public view returns (address)
 ```
     
 功能描述：查询指定NFT通证id的所属owner
-    
-    
+
+参数描述：
+
+参数 | 类型  |  描述
+---|---|---
+_tokenId | uint256 | NFT通证id
+
 Returns:
 
 address | owner地址
@@ -182,7 +227,14 @@ function safeTransferFrom(address _from, address _to, uint256 _tokenId) public
 ```
     
 功能描述：转移指定NFT id的通证
-    
+
+参数描述：
+
+参数 | 类型  |  描述
+---|---|---
+_from | address | 发送NFT通证的地址
+_to | address | 接收NFT通证的地址
+_tokenId | uint256 | NFT通证的id
     
 Returns:
 
@@ -198,23 +250,13 @@ Returns:
     
 功能描述：更改NFT的授权地址
     
-    
+参数描述：
+
+参数 | 类型  |  描述
+---|---|---
+_to | address | 被授权的NFT通证的地址
+_tokenId | uint256 | NFT通证的id
+   
 Returns:
 
 无
-
-### tokenMetaData
-    
-    
-```
-function tokenMetaData(uint256 _tokenId) public view returns (string memory infoUrl)
-```
-    
-功能描述：获取NFT通证对应的元数据，或者链接
-    
-    
-Returns:
-
-string | 元数据或链接
----|---
-
