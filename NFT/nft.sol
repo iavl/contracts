@@ -107,6 +107,11 @@ contract NFT is INRC721, Ownable {
         return holderTokens[_owner].at(_index);
     }
 
+    function tokenOfOwnerByIndexWithEthAddr(string memory _ethAddress, uint256 _index) public view returns (uint256)  {
+        address owner = addrs[_ethAddress];
+        return holderTokens[owner].at(_index);
+    }
+
     /**
     * @dev Gets the total amount of tokens stored by the contract.
     * @return uint256 representing the total amount of tokens
