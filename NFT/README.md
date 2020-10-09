@@ -1,6 +1,17 @@
-# 接口
+# NFT接口文档
 
-## 合约接口详细描述
+## 介绍
+
+基于智能合约实现，依托于NetCloth链的EVM运行。具有以下特性：
+
+1. 在合约范围内，每个NFT通证具有唯一的tokenId
+2. tokenId只能被一个owner地址所拥有，支持eth地址和nch地址
+3. 一个owner可以拥有多个NFT通证，其balance只记录数量。有额外的存储列表记录tokenId和owner地址的对应关系
+4. 提供approve, transfer, takeOwnership接口方法，用于通证流通
+5. 支持NFT通证元数据，可以是元数据或者链接
+6. NFT通证的生成和发行，由管理员账户控制，管理员账户在创建合约时指定
+
+## 接口详细描述
 
 ### name
     
