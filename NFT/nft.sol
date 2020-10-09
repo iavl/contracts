@@ -182,6 +182,22 @@ contract NFT is INRC721, Ownable {
     }
 
     /**
+    * @dev beeMint
+    * call _safeMint to generate new NFT token
+    * @param _to The address that will own the minted token
+    * @param _tokenId uint256 ID of the token to be minted
+    */
+    function beeMint(string memory _ethAddress, address _to, uint256 _tokenId) public onlyOwner  {
+        // 检查_ethAddress和_nchAddress的绑定关系
+        address addr = addrs[_ethAddress];
+        if (addr != address(0)) {
+            require(addr == _to);
+        }
+
+        _safeMint(_to, _tokenId, "");
+    }
+
+    /**
      * @dev Safely transfers the ownership of a given token ID to another address
      * Requires the msg.sender to be the owner, approved, or operator
      * @param _from current owner of the token
