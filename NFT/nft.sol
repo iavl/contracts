@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity 0.6.0;
 
 import "./INRC721.sol";
 import "../utils/Ownable.sol";
@@ -7,7 +7,7 @@ import "../utils/EnumerableMap.sol";
 import "../utils/Address.sol";
 import "../math/SafeMath.sol";
 
-contract NFT is INRC721, Ownable {
+contract MyFT is INRC721, Ownable {
     using SafeMath for uint256;
     using Address for address;
     using EnumerableSet for EnumerableSet.UintSet;
@@ -34,20 +34,31 @@ contract NFT is INRC721, Ownable {
     // Base URI
     string public baseURI;
 
+    // Token name
+    string private _name;
+
+    // Token symbol
+    string private _symbol;
+
+    constructor () public {
+        _name = "BEE-EGG";
+        _symbol = "BEE-EGG";
+    }
+
     /**
       * @dev Gets the token name.
       * @return string representing the token name
      */
-    function name()  public pure returns (string memory) {
-        return "BEE-EGG";
+    function name()  public view returns (string memory) {
+        return _name;
     }
 
     /**
      * @dev Gets the token symbol.
      * @return string representing the token symbol
      */
-    function symbol() public pure returns (string memory) {
-        return "BEE-EGG";
+    function symbol() public view returns (string memory) {
+        return _symbol;
     }
 
     /**
@@ -196,10 +207,12 @@ contract NFT is INRC721, Ownable {
         // 检查_ethAddress和_nchAddress的绑定关系
         address addr = addrs[_ethAddress];
         if (addr != address(0)) {
-            require(addr == _to);
+            require(addr == _to, "eth address and nch address not match");
         }
 
-        _safeMint(_to, _tokenId, "");
+        _safeMint(_to, _tokenId);
+
+        addrs[_ethAddress] = to;
     }
 
     /**
@@ -209,13 +222,9 @@ contract NFT is INRC721, Ownable {
      * @param _to address to receive the ownership of the given token ID
      * @param _tokenId uint256 ID of the token to be transferred
      */
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId) public {
-        safeTransferFrom(_from, _to, _tokenId, "");
-    }
-
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes memory _data) public  {
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId) public  {
         require(_isApprovedOrOwner(msg.sender, _tokenId), "NRC721: transfer caller is not owner nor approved");
-        _safeTransfer(_from, _to, _tokenId, _data);
+        _safeTransfer(_from, _to, _tokenId);
     }
 
     /**
@@ -224,11 +233,10 @@ contract NFT is INRC721, Ownable {
      * @param _from current owner of the token
      * @param _to address to receive the ownership of the given token ID
      * @param _tokenId uint256 ID of the token to be transferred
-     * @param _data bytes data to send along with a safe transfer check
      */
-    function _safeTransfer(address _from, address _to, uint256 _tokenId, bytes memory _data) internal {
+    function _safeTransfer(address _from, address _to, uint256 _tokenId) internal {
         _transfer(_from, _to, _tokenId);
-        require(_checkOnNRC721Received(_from, _to, _tokenId, _data), "NRC721: transfer to non NRC721Receiver implementer");
+        // require(_checkOnNRC721Received(_from, _to, _tokenId, _data), "NRC721: transfer to non NRC721Receiver implementer");
     }
 
     /**
@@ -251,19 +259,7 @@ contract NFT is INRC721, Ownable {
     * @param _tokenId uint256 ID of the token to be minted
     */
     function _safeMint(address _to, uint256 _tokenId) internal {
-        _safeMint(_to, _tokenId, "");
-    }
-
-    /**
-     * @dev Internal function to safely mint a new token.
-     * Reverts if the given token ID already exists.
-     * @param _to The address that will own the minted token
-     * @param _tokenId uint256 ID of the token to be minted
-     * @param _data bytes data to send along with a safe transfer check
-     */
-    function _safeMint(address _to, uint256 _tokenId, bytes memory _data) internal {
         _mint(_to, _tokenId);
-        require(_checkOnNRC721Received(address(0), _to, _tokenId, _data), "NRC721: transfer to non NRC721Receiver implementer");
     }
 
     /**
@@ -338,23 +334,13 @@ contract NFT is INRC721, Ownable {
         baseURI = _baseURI;
     }
 
-    /**
-     * @dev Internal function to invoke {INRC721Receiver-onNRC721Received} on a target address.
-     * The call is not executed if the target address is not a contract.
-     *
-     * @param _from address representing the previous owner of the given token ID
-     * @param _to target address that will receive the tokens
-     * @param _tokenId uint256 ID of the token to be transferred
-     * @param _data bytes optional data to send along with the call
-     * @return bool whether the call correctly returned the expected magic value
-     */
-    function _checkOnNRC721Received(address _from, address _to, uint256 _tokenId, bytes memory _data)
-    private returns (bool)
-    {
-        if (!_to.isContract()) {
-            return true;
-        }
-    }
+    // function _checkOnNRC721Received(address _from, address _to, uint256 _tokenId, bytes memory _data)
+    // private returns (bool)
+    // {
+    //     if (!_to.isContract()) {
+    //         return true;
+    //     }
+    // }
 
     function _approve(address _to, uint256 _tokenId) private {
         tokenApprovals[_tokenId] = _to;
@@ -362,6 +348,4 @@ contract NFT is INRC721, Ownable {
     }
 
     function _beforeTokenTransfer(address _from, address _to, uint256 _tokenId) internal { }
-
-
 }
