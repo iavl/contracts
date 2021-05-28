@@ -1,8 +1,4 @@
 /**
- *Submitted for verification at BscScan.com on 2021-05-11
-*/
-
-/**
  *Submitted for verification at BscScan.com on 2021-03-01
 */
 
@@ -11,17 +7,17 @@
 */
 
 /**
-
+  
    #BEE
-
+   
    #LIQ+#RFI+#SHIB+#DOGE = #BEE
 
-   #shrimp features:
+   #SAFEMOON features:
    3% fee auto add to the liquidity pool to locked forever when selling
    2% fee auto distribute to all holders
    I created a black hole so #Bee token will deflate itself in supply with every transaction
    50% Supply is burned at start.
-
+   
 
  */
 
@@ -111,7 +107,7 @@ interface IERC20 {
  * Using this library instead of the unchecked operations eliminates an entire
  * class of bugs, so it's recommended to use it always.
  */
-
+ 
 library SafeMath {
     /**
      * @dev Returns the addition of two unsigned integers, reverting on
@@ -342,7 +338,7 @@ library Address {
      * _Available since v3.1._
      */
     function functionCall(address target, bytes memory data) internal returns (bytes memory) {
-        return functionCall(target, data, "Address: low-level call failed");
+      return functionCall(target, data, "Address: low-level call failed");
     }
 
     /**
@@ -448,13 +444,13 @@ contract Ownable is Context {
         _;
     }
 
-    /**
-    * @dev Leaves the contract without owner. It will not be possible to call
-    * `onlyOwner` functions anymore. Can only be called by the current owner.
-    *
-    * NOTE: Renouncing ownership will leave the contract without an owner,
-    * thereby removing any functionality that is only available to the owner.
-    */
+     /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
     function renounceOwnership() public virtual onlyOwner {
         emit OwnershipTransferred(_owner, address(0));
         _owner = address(0);
@@ -481,7 +477,7 @@ contract Ownable is Context {
         _lockTime = now + time;
         emit OwnershipTransferred(_owner, address(0));
     }
-
+    
     //Unlocks the contract for owner when _lockTime is exceeds
     function unlock() public virtual {
         require(_previousOwner == msg.sender, "You don't have permission to unlock");
@@ -638,19 +634,19 @@ interface IUniswapV2Router01 {
         uint deadline
     ) external returns (uint[] memory amounts);
     function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
-    external
-    payable
-    returns (uint[] memory amounts);
+        external
+        payable
+        returns (uint[] memory amounts);
     function swapTokensForExactETH(uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
-    external
-    returns (uint[] memory amounts);
+        external
+        returns (uint[] memory amounts);
     function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
-    external
-    returns (uint[] memory amounts);
+        external
+        returns (uint[] memory amounts);
     function swapETHForExactTokens(uint amountOut, address[] calldata path, address to, uint deadline)
-    external
-    payable
-    returns (uint[] memory amounts);
+        external
+        payable
+        returns (uint[] memory amounts);
 
     function quote(uint amountA, uint reserveA, uint reserveB) external pure returns (uint amountB);
     function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external pure returns (uint amountOut);
@@ -705,7 +701,7 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
 }
 
 
-contract Shrimp is Context, IERC20, Ownable {
+contract SafeMoon is Context, IERC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
@@ -717,31 +713,31 @@ contract Shrimp is Context, IERC20, Ownable {
 
     mapping (address => bool) private _isExcluded;
     address[] private _excluded;
-
+   
     uint256 private constant MAX = ~uint256(0);
-    uint256 private _tTotal = 1000000000  * 10**7 * 10**9;
+    uint256 private _tTotal = 1000000000 * 10**6 * 10**9;
     uint256 private _rTotal = (MAX - (MAX % _tTotal));
     uint256 private _tFeeTotal;
 
-    string private _name = "shrimp";
-    string private _symbol = "SHRIMP";
+    string private _name = "SafeMoon";
+    string private _symbol = "SAFEMOON";
     uint8 private _decimals = 9;
-
+    
     uint256 public _taxFee = 5;
     uint256 private _previousTaxFee = _taxFee;
-
+    
     uint256 public _liquidityFee = 5;
     uint256 private _previousLiquidityFee = _liquidityFee;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
     address public immutable uniswapV2Pair;
-
+    
     bool inSwapAndLiquify;
     bool public swapAndLiquifyEnabled = true;
-
-    uint256 public _maxTxAmount = 5000000 * 10**7 * 10**9;
-    uint256 private numTokensSellToAddToLiquidity = 500000 * 10**7 * 10**9;
-
+    
+    uint256 public _maxTxAmount = 5000000 * 10**6 * 10**9;
+    uint256 private numTokensSellToAddToLiquidity = 500000 * 10**6 * 10**9;
+    
     event MinTokensBeforeSwapUpdated(uint256 minTokensBeforeSwap);
     event SwapAndLiquifyEnabledUpdated(bool enabled);
     event SwapAndLiquify(
@@ -749,28 +745,28 @@ contract Shrimp is Context, IERC20, Ownable {
         uint256 ethReceived,
         uint256 tokensIntoLiqudity
     );
-
+    
     modifier lockTheSwap {
         inSwapAndLiquify = true;
         _;
         inSwapAndLiquify = false;
     }
-
+    
     constructor () public {
         _rOwned[_msgSender()] = _rTotal;
-
+        
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F);
-        // Create a uniswap pair for this new token
+         // Create a uniswap pair for this new token
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
-        .createPair(address(this), _uniswapV2Router.WETH());
+            .createPair(address(this), _uniswapV2Router.WETH());
 
         // set the rest of the contract variables
         uniswapV2Router = _uniswapV2Router;
-
+        
         //exclude owner and this contract from fee
         _isExcludedFromFee[owner()] = true;
         _isExcludedFromFee[address(this)] = true;
-
+        
         emit Transfer(address(0), _msgSender(), _tTotal);
     }
 
@@ -860,6 +856,7 @@ contract Shrimp is Context, IERC20, Ownable {
     }
 
     function excludeFromReward(address account) public onlyOwner() {
+        // require(account != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'We can not exclude Uniswap router.');
         require(!_isExcluded[account], "Account is already excluded");
         if(_rOwned[account] > 0) {
             _tOwned[account] = tokenFromReflection(_rOwned[account]);
@@ -880,33 +877,33 @@ contract Shrimp is Context, IERC20, Ownable {
             }
         }
     }
-    function _transferBothExcluded(address sender, address recipient, uint256 tAmount) private {
+        function _transferBothExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
         _tOwned[sender] = _tOwned[sender].sub(tAmount);
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
         _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
-        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
+        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);        
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
     }
-
-    function excludeFromFee(address account) public onlyOwner {
+    
+        function excludeFromFee(address account) public onlyOwner {
         _isExcludedFromFee[account] = true;
     }
-
+    
     function includeInFee(address account) public onlyOwner {
         _isExcludedFromFee[account] = false;
     }
-
+    
     function setTaxFeePercent(uint256 taxFee) external onlyOwner() {
         _taxFee = taxFee;
     }
-
+    
     function setLiquidityFeePercent(uint256 liquidityFee) external onlyOwner() {
         _liquidityFee = liquidityFee;
     }
-
+   
     function setMaxTxPercent(uint256 maxTxPercent) external onlyOwner() {
         _maxTxAmount = _tTotal.mul(maxTxPercent).div(
             10**2
@@ -917,8 +914,8 @@ contract Shrimp is Context, IERC20, Ownable {
         swapAndLiquifyEnabled = _enabled;
         emit SwapAndLiquifyEnabledUpdated(_enabled);
     }
-
-    //to recieve ETH from uniswapV2Router when swaping
+    
+     //to recieve ETH from uniswapV2Router when swaping
     receive() external payable {}
 
     function _reflectFee(uint256 rFee, uint256 tFee) private {
@@ -954,7 +951,7 @@ contract Shrimp is Context, IERC20, Ownable {
 
     function _getCurrentSupply() private view returns(uint256, uint256) {
         uint256 rSupply = _rTotal;
-        uint256 tSupply = _tTotal;
+        uint256 tSupply = _tTotal;      
         for (uint256 i = 0; i < _excluded.length; i++) {
             if (_rOwned[_excluded[i]] > rSupply || _tOwned[_excluded[i]] > tSupply) return (_rTotal, _tTotal);
             rSupply = rSupply.sub(_rOwned[_excluded[i]]);
@@ -963,7 +960,7 @@ contract Shrimp is Context, IERC20, Ownable {
         if (rSupply < _rTotal.div(_tTotal)) return (_rTotal, _tTotal);
         return (rSupply, tSupply);
     }
-
+    
     function _takeLiquidity(uint256 tLiquidity) private {
         uint256 currentRate =  _getRate();
         uint256 rLiquidity = tLiquidity.mul(currentRate);
@@ -971,7 +968,7 @@ contract Shrimp is Context, IERC20, Ownable {
         if(_isExcluded[address(this)])
             _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity);
     }
-
+    
     function calculateTaxFee(uint256 _amount) private view returns (uint256) {
         return _amount.mul(_taxFee).div(
             10**2
@@ -983,22 +980,22 @@ contract Shrimp is Context, IERC20, Ownable {
             10**2
         );
     }
-
+    
     function removeAllFee() private {
         if(_taxFee == 0 && _liquidityFee == 0) return;
-
+        
         _previousTaxFee = _taxFee;
         _previousLiquidityFee = _liquidityFee;
-
+        
         _taxFee = 0;
         _liquidityFee = 0;
     }
-
+    
     function restoreAllFee() private {
         _taxFee = _previousTaxFee;
         _liquidityFee = _previousLiquidityFee;
     }
-
+    
     function isExcludedFromFee(address account) public view returns(bool) {
         return _isExcludedFromFee[account];
     }
@@ -1027,12 +1024,12 @@ contract Shrimp is Context, IERC20, Ownable {
         // also, don't get caught in a circular liquidity event.
         // also, don't swap & liquify if sender is uniswap pair.
         uint256 contractTokenBalance = balanceOf(address(this));
-
+        
         if(contractTokenBalance >= _maxTxAmount)
         {
             contractTokenBalance = _maxTxAmount;
         }
-
+        
         bool overMinTokenBalance = contractTokenBalance >= numTokensSellToAddToLiquidity;
         if (
             overMinTokenBalance &&
@@ -1044,15 +1041,15 @@ contract Shrimp is Context, IERC20, Ownable {
             //add liquidity
             swapAndLiquify(contractTokenBalance);
         }
-
+        
         //indicates if fee should be deducted from transfer
         bool takeFee = true;
-
+        
         //if any account belongs to _isExcludedFromFee account then remove the fee
         if(_isExcludedFromFee[from] || _isExcludedFromFee[to]){
             takeFee = false;
         }
-
+        
         //transfer amount, it will take tax, burn, liquidity fee
         _tokenTransfer(from,to,amount,takeFee);
     }
@@ -1076,7 +1073,7 @@ contract Shrimp is Context, IERC20, Ownable {
 
         // add liquidity to uniswap
         addLiquidity(otherHalf, newBalance);
-
+        
         emit SwapAndLiquify(half, newBalance, otherHalf);
     }
 
@@ -1117,7 +1114,7 @@ contract Shrimp is Context, IERC20, Ownable {
     function _tokenTransfer(address sender, address recipient, uint256 amount,bool takeFee) private {
         if(!takeFee)
             removeAllFee();
-
+        
         if (_isExcluded[sender] && !_isExcluded[recipient]) {
             _transferFromExcluded(sender, recipient, amount);
         } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
@@ -1129,7 +1126,7 @@ contract Shrimp is Context, IERC20, Ownable {
         } else {
             _transferStandard(sender, recipient, amount);
         }
-
+        
         if(!takeFee)
             restoreAllFee();
     }
@@ -1147,7 +1144,7 @@ contract Shrimp is Context, IERC20, Ownable {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
         _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
-        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
+        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);           
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
@@ -1157,13 +1154,13 @@ contract Shrimp is Context, IERC20, Ownable {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
         _tOwned[sender] = _tOwned[sender].sub(tAmount);
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
-        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
+        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);   
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
     }
 
 
-
+    
 
 }
