@@ -1,4 +1,5 @@
 pragma solidity ^0.6.12;
+// SPDX-License-Identifier: Unlicensed
 
 abstract contract Context {
     function _msgSender() internal view virtual returns (address payable) {
@@ -434,6 +435,9 @@ contract SMI is Context, IERC20, Ownable {
     string private _symbol = 'SMI';
     uint8 private _decimals = 8;
 
+    uint256 public _taxFee = 2;
+    uint256 private _previousTaxFee = _taxFee;
+
     constructor () public {
         _rOwned[_msgSender()] = _rTotal;
         emit Transfer(address(0), _msgSender(), _tTotal);
@@ -619,8 +623,8 @@ contract SMI is Context, IERC20, Ownable {
         return (rAmount, rTransferAmount, rFee, tTransferAmount, tFee);
     }
 
-    function _getTValues(uint256 tAmount) private pure returns (uint256, uint256) {
-        uint256 tFee = tAmount.div(100).mul(2);
+    function _getTValues(uint256 tAmount) private view returns (uint256, uint256) {
+        uint256 tFee = calculateTaxFee(tAmount);
         uint256 tTransferAmount = tAmount.sub(tFee);
         return (tTransferAmount, tFee);
     }
@@ -648,4 +652,24 @@ contract SMI is Context, IERC20, Ownable {
         if (rSupply < _rTotal.div(_tTotal)) return (_rTotal, _tTotal);
         return (rSupply, tSupply);
     }
+
+    function calculateTaxFee(uint256 _amount) private view returns (uint256) {
+        return _amount.mul(_taxFee).div(10**2);
+    }
+
+    function removeAllFee() private {
+        if(_taxFee == 0) return;
+        _previousTaxFee = _taxFee;
+
+        _taxFee = 0;
+    }
+
+    function restoreAllFee() private {
+        _taxFee = _previousTaxFee;
+    }
+
+    function setTaxFeePercent(uint256 taxFee) external onlyOwner() {
+        _taxFee = taxFee;
+    }
+
 }
