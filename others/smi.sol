@@ -423,7 +423,7 @@ contract SMI is Context, IERC20, Ownable {
     mapping (address => uint256) private _tOwned;
     mapping (address => mapping (address => uint256)) private _allowances;
 
-    mapping (address => bool) private _isExcluded;
+    mapping (address => bool) private _isExcluded_isExcluded;
     address[] private _excluded;
 
     uint256 private constant MAX = ~uint256(0);
